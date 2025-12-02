@@ -1,10 +1,14 @@
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from world import World
+
 import pygame
-from entity import Entity
+from world import Entity
 
 
 class Camera(Entity):
-    def __init__(self, width: int, height: int, speed: float = 5.0):
-        super().__init__(0, 0, width, height, image_map={})  # Initialize the parent Entity class
+    def __init__(self, world: World, width: int, height: int, speed: float = 2.0):
+        super().__init__(world, 0, 0, width, height, image_map={})  # Initialize the parent Entity class
         self.speed = speed
 
     def handle_input(self):

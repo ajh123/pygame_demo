@@ -3,18 +3,21 @@ screen = pygame.display.set_mode((800, 600), pygame.RESIZABLE)
 pygame.init()
 
 from camera import Camera
-from tiles import GRASS, DIRT
 from renderer import Renderer
 from entities import Chest, Tree
-from world import World
+from utils import load_image
+from world import Tile, World, is_entity_at
 
 import random
+
+GRASS = Tile("grass", load_image("assets/0_0.png"))
+DIRT = Tile("dirt", load_image("assets/32_64.png"))
 
 def generate_tiles(world: World):
     random.seed(0)
     r = random.random()
     tile_map = world.get_tile_map()
-    entities = world.get_entities()
+    excluded = [Camera]
     for x in range(-50, 50):
         for y in range(-50, 50):
             r = random.random()
@@ -23,23 +26,17 @@ def generate_tiles(world: World):
             else:
                 tile_map.add_tile(x, y, GRASS)
                 if r < 0.1:
-                    print(world.is_entity_at(x, y))
-                    if not world.is_entity_at(x, y):
-                        tree = Tree(x, y)
-                        entities.append(tree)
+                    if not is_entity_at(world, x, y, excluded):
+                        Tree(world, x, y)
             if r < 0.005:
-                if not world.is_entity_at(x, y):
-                    chest = Chest(x, y)
-                    entities.append(chest)
+                if not is_entity_at(world, x, y, excluded):
+                    Chest(world, x, y)
 
 def main():
     global screen
     clock = pygame.time.Clock()
     world = World()
-
-    camera = Camera(screen.get_width(), screen.get_height())
-    world.add_entity(camera)
-
+    camera = Camera(world, screen.get_width(), screen.get_height())
     renderer = Renderer(screen, camera, world)
 
     generate_tiles(world)

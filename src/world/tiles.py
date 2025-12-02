@@ -1,5 +1,4 @@
 import pygame
-from loaders import load_image
 
 
 class Tile:
@@ -20,5 +19,4 @@ class TileMap:
     def remove_tile(self, x: int, y: int):
         self.tiles.pop((x, y), None)
 
-GRASS = Tile("grass", load_image("assets/0_0.png"))
-DIRT = Tile("dirt", load_image("assets/32_64.png"))
+
