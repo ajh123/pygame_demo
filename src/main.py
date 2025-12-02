@@ -1,8 +1,8 @@
 import pygame
 import random
 
-from camera import Camera, get_screen_bounds
-from graphics import Renderer, ImageLoader, MessageLog
+from player import Player, get_screen_bounds
+from graphics import Renderer, ImageLoader, MessageLog, HUD
 from entities import Chest, Tree, Zombie
 from world import Tile, World
 
@@ -21,11 +21,12 @@ class Game:
         self.log = MessageLog(self.font)
 
         self.world = World(self.log)
-        self.camera = Camera(self.screen.get_width(), self.screen.get_height())
-        self.camera.set_world(self.world)
+        self.player = Player(self.screen.get_width(), self.screen.get_height())
+        self.player.set_world(self.world)
+        self.hud = HUD(self.font, self.player)
 
         self.loader = ImageLoader()
-        self.renderer = Renderer(self.screen, self.camera, self.world, self.loader)
+        self.renderer = Renderer(self.screen, self.player, self.world, self.loader)
 
         random.seed(0)
         self.generate_tiles()
@@ -56,13 +57,13 @@ class Game:
                 self.screen = pygame.display.set_mode(
                     (event.w, event.h), pygame.RESIZABLE
                 )
-                self.camera.display_width = event.w
-                self.camera.display_height = event.h
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+                self.player.display_width = event.w
+                self.player.display_height = event.h
+            elif not self.world.is_frozen and event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left click
-                    self.camera.handle_click(event.pos[0], event.pos[1])
+                    self.player.handle_click(event.pos[0], event.pos[1])
 
-        self.camera.handle_input()
+        self.player.handle_input()
 
     def update_timing(self):
         now = pygame.time.get_ticks() / 1000
@@ -71,12 +72,12 @@ class Game:
         self.accumulator += min(dt, 0.25)
 
     def perform_fixed_updates(self):
-        while self.accumulator >= self.fixed_dt:
+        while self.accumulator >= self.fixed_dt and not self.world.is_frozen:
             self.update_world(self.fixed_dt)
             self.accumulator -= self.fixed_dt
 
     def update_world(self, dt: float):
-        min_x, min_y, max_x, max_y = get_screen_bounds(self.camera)
+        min_x, min_y, max_x, max_y = get_screen_bounds(self.player)
         entities = self.world.get_entities_in_region(min_x, min_y, max_x, max_y)
         for entity in entities:
             entity.tick(dt)
@@ -85,7 +86,7 @@ class Game:
 
     def generate_tiles(self):
         tile_map = self.world.get_tile_map()
-        excluded = [Camera]
+        excluded = [Player]
         for x in range(-50, 50):
             for y in range(-50, 50):
                 r = random.random()
@@ -108,7 +109,7 @@ class Game:
                         del chest
 
     def spawn_zombies(self, count: int):
-        excluded = [Camera]
+        excluded = [Player]
         for _ in range(count):
             x = random.randint(-50, 50)
             y = random.randint(-50, 50)
@@ -122,6 +123,7 @@ class Game:
         self.screen.fill((0, 0, 0))
         self.renderer.render()
         self.log.draw(self.screen)
+        self.hud.draw(self.screen)
         pygame.display.flip()
 
 

@@ -1,4 +1,4 @@
-from camera import Camera
+from player import Player
 from world import Entity
 import time
 
@@ -14,7 +14,7 @@ class Chest(Entity):
         self.is_open = False
         self.delay = 0.0 # Delay in seconds before it can be opened again
 
-    def interact(self, player: 'Camera'):
+    def interact(self, player: 'Player'):
         if self.world is None:
             return
 
@@ -71,5 +71,5 @@ class Zombie(Entity):
         if random.random() < 0.05:
             res = self.world.entities_in_radius(self.x, self.y, 2, excluded=[Zombie])
             for entity in res:
-                if isinstance(entity, Camera):
+                if isinstance(entity, Player):
                     entity.take_damage(5)

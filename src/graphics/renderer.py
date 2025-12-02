@@ -1,5 +1,5 @@
 import pygame
-from camera import Camera, world_to_screen, get_screen_bounds
+from player import Player, world_to_screen, get_screen_bounds
 from world import World
 from constants import TILE_SIZE
 from .image_utils import ImageLoader
@@ -9,12 +9,12 @@ class Renderer:
     def __init__(
             self,
             screen: pygame.Surface,
-            camera: Camera,
+            player: Player,
             world: World,
             image_loader: ImageLoader
         ):
         self.screen = screen
-        self.camera = camera
+        self.player = player
         self.world = world
         self.image_loader = image_loader
 
@@ -24,32 +24,32 @@ class Renderer:
 
     def renderTileMap(self):
         # Determine visible tile range
-        # Camera.x / y are in tile coordinates; convert camera center to
+        # player.x / y are in tile coordinates; convert player center to
         # pixel coordinates before computing visible tile ranges.
-        cam_px = (self.camera.x * TILE_SIZE)
-        cam_py = (self.camera.y * TILE_SIZE)
+        cam_px = (self.player.x * TILE_SIZE)
+        cam_py = (self.player.y * TILE_SIZE)
 
-        start_x = int((cam_px - (self.camera.display_width // 2)) // TILE_SIZE)
-        end_x = int((cam_px + (self.camera.display_width // 2)) // TILE_SIZE + 1)
-        start_y = int((cam_py - (self.camera.display_height // 2)) // TILE_SIZE)
-        end_y = int((cam_py + (self.camera.display_height // 2)) // TILE_SIZE + 1)
+        start_x = int((cam_px - (self.player.display_width // 2)) // TILE_SIZE)
+        end_x = int((cam_px + (self.player.display_width // 2)) // TILE_SIZE + 1)
+        start_y = int((cam_py - (self.player.display_height // 2)) // TILE_SIZE)
+        end_y = int((cam_py + (self.player.display_height // 2)) // TILE_SIZE + 1)
 
         for x in range(start_x, end_x):
             for y in range(start_y, end_y):            
                 tile = self.world.get_tile_at(x, y)
                 if tile:
                     image = self.image_loader.load(tile.image)
-                    screen_x, screen_y = world_to_screen(x, y, self.camera)
+                    screen_x, screen_y = world_to_screen(x, y, self.player)
                     self.screen.blit(image, (screen_x, screen_y))
 
     def renderEntities(self):       
-        min_x, min_y, max_x, max_y = get_screen_bounds(self.camera)
+        min_x, min_y, max_x, max_y = get_screen_bounds(self.player)
         
         # Query only entities in the visible region using spatial hash
         visible_entities = self.world.get_entities_in_region(min_x, min_y, max_x, max_y)
         
         for entity in visible_entities:
-            screen_x, screen_y = world_to_screen(entity.x, entity.y, self.camera)
+            screen_x, screen_y = world_to_screen(entity.x, entity.y, self.player)
             img = entity.get_current_image()
             if img:
                 img = self.image_loader.load(img)

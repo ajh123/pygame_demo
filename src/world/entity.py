@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from camera import Camera
+    from player import Player
 
 from .world import World
 from constants import TILE_SIZE
@@ -94,7 +94,7 @@ class Entity:
         if self.x != orig_x or self.y != orig_y:
             self.world.update_entity_position(self)
 
-    def interact(self, player: 'Camera'):
+    def interact(self, player: 'Player'):
         pass
 
     def take_damage(self, amount: float):

@@ -11,6 +11,7 @@ class World:
         self.tile_map = TileMap()
         self.spatial_hash = SpatialHash(cell_size=1.0)  # 1 world unit per cell
         self.log = message_log
+        self.is_frozen = False
 
     def add_entity(self, entity: Entity):
         self.spatial_hash.insert(entity)
