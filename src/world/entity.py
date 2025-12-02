@@ -40,7 +40,7 @@ class Entity:
         target_y = self.y + self.velocity_dy
 
         # exclude self from collision checks
-        excluded = [self]
+        excluded = [type(self)]
 
         # If combined movement is free, apply both
         if is_entity_at(self.world, int(target_x), int(target_y), excluded) is None:
