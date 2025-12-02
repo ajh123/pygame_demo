@@ -1,19 +1,17 @@
 from .world import World
-from .utils import is_entity_at
+from constants import TILE_SIZE
 
 class Entity:
     def __init__(self,
-                 world: World,
                  x: float,
                  y: float,
                  width: int,
                  height: int,
                  image_map: dict[str, str]
         ):
-        self.world = world
-        self.world.add_entity(self)
-        self.width = width
-        self.height = height
+        self.world: World | None = None
+        self.world_units_width = width / TILE_SIZE
+        self.world_units_height = height / TILE_SIZE
         self.x = x
         self.y = y
         self.velocity_dx = 0.0
@@ -22,45 +20,71 @@ class Entity:
         self.current_image_key: str | None = None
         self.health = -1 # -1 means infinite health
 
+    def set_world(self, world: World):
+        self.world = world
+        world.add_entity(self)
+
     def tick(self, dt: float):
-        """Update entity position based on its velocity with basic collision checking.
+        """Move applying simple AABB entity-vs-entity collision using World.has_collision.
 
-        This performs a simple entity-vs-entity AABB-style check using
-        `is_entity_at`. It first attempts the combined move; if blocked,
-        it tries axis-separated moves so entities can slide along obstacles.
-        When a collision is detected on an axis, the corresponding
-        velocity component is zeroed to prevent repeated collision.
+        Strategy:
+        1) Compute target (x, y).
+        2) Test combined move at (target_x, target_y). If free, apply both and return.
+        3) Test horizontal-only at (target_x, orig_y). If free, apply x (keep trying vertical later).
+        Otherwise treat X as blocked and zero velocity_dx.
+        4) Test vertical at (current_x, target_y). If free, apply y. Otherwise treat Y as blocked
+        and zero velocity_dy.
+
+        This uses temporary position changes only for collision testing; it relies on
+        World.has_collision ignoring the source entity (your implementation does).
         """
+        if not self.world:
+            return
 
-        # No movement -> nothing to do
         if self.velocity_dx == 0.0 and self.velocity_dy == 0.0:
             return
 
         target_x = self.x + (self.velocity_dx * dt)
         target_y = self.y + (self.velocity_dy * dt)
+        orig_x, orig_y = self.x, self.y
 
-        # exclude self from collision checks
-        excluded = [type(self)]
+        # Helper: test whether moving the entity to (cx, cy) would collide with another entity.
+        # We temporarily set self.x/self.y so the world's AABB check uses the candidate position,
+        # then restore the original coordinates immediately.
+        def _collides_at(cx: float, cy: float) -> bool:
+            if not self.world:
+                return False
 
-        # If combined movement is free, apply both
-        if is_entity_at(self.world, int(target_x), int(target_y), excluded) is None:
-            self.x = target_x
-            self.y = target_y
+            saved_x, saved_y = self.x, self.y
+            try:
+                self.x, self.y = cx, cy
+                return bool(self.world.has_collision(self))
+            finally:
+                self.x, self.y = saved_x, saved_y
+
+        # 1) Combined move
+        if not _collides_at(target_x, target_y):
+            self.x, self.y = target_x, target_y
             return
 
-        # Try horizontal move only
-        if is_entity_at(self.world, int(target_x), int(self.y), excluded) is None:
+        # 2) Horizontal-only (from original Y)
+        if not _collides_at(target_x, orig_y):
+            # horizontal allowed
             self.x = target_x
         else:
-            # Blocked on X axis
+            # blocked on X
+            self.x = orig_x
             self.velocity_dx = 0.0
 
-        # Try vertical move only
-        if is_entity_at(self.world, int(self.x), int(target_y), excluded) is None:
+        # 3) Vertical (from whatever x we ended up with after horizontal attempt)
+        if not _collides_at(self.x, target_y):
             self.y = target_y
         else:
-            # Blocked on Y axis
+            # blocked on Y
+            self.y = orig_y
             self.velocity_dy = 0.0
+
+
 
     def take_damage(self, amount: float):
         if self.health < 0:
@@ -71,6 +95,9 @@ class Entity:
             self.die()
 
     def die(self):
+        if not self.world:
+            return
+
         self.world.get_entities().remove(self)
 
     def set_velocity(self, dx: float, dy: float):

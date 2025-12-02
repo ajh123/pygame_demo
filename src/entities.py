@@ -1,13 +1,13 @@
-from world import World, Entity
+from world import Entity
 
 
 class Chest(Entity):
-    def __init__(self, world: World, x: float, y: float):
+    def __init__(self, x: float, y: float):
         images = {
             "closed": "assets/chest_closed.png",
             "open": "assets/chest_open.png"
         }
-        super().__init__(world, x, y, 32, 32, images)
+        super().__init__(x, y, 32, 32, images)
         self.set_image_state("closed")
         self.is_open = False
 
@@ -20,20 +20,20 @@ class Chest(Entity):
 
 
 class Tree(Entity):
-    def __init__(self, world: World, x: float, y: float):
+    def __init__(self, x: float, y: float):
         images = {
             "default": "assets/jungle-tree_0.png"
         }
-        super().__init__(world, x, y, 64, 64, images)
+        super().__init__(x, y, 64, 64, images)
         self.set_image_state("default")
 
 
 class Zombie(Entity):
-    def __init__(self, world: World, x: float, y: float):
+    def __init__(self, x: float, y: float):
         images = {
             "default": "assets/zombie000.png"
         }
-        super().__init__(world, x, y, 32, 64, images)
+        super().__init__(x, y, 32, 64, images)
         self.set_image_state("default")
         self.health = 100
 

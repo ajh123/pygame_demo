@@ -33,10 +33,10 @@ class Renderer:
         cam_px = (self.camera.x * TILE_SIZE)
         cam_py = (self.camera.y * TILE_SIZE)
 
-        start_x = int((cam_px - self.camera.width // 2) // TILE_SIZE)
-        end_x = int((cam_px + self.camera.width // 2) // TILE_SIZE + 1)
-        start_y = int((cam_py - self.camera.height // 2) // TILE_SIZE)
-        end_y = int((cam_py + self.camera.height // 2) // TILE_SIZE + 1)
+        start_x = int((cam_px - (self.camera.display_width // 2)) // TILE_SIZE)
+        end_x = int((cam_px + (self.camera.display_width // 2)) // TILE_SIZE + 1)
+        start_y = int((cam_py - (self.camera.display_height // 2)) // TILE_SIZE)
+        end_y = int((cam_py + (self.camera.display_height // 2)) // TILE_SIZE + 1)
 
         for x in range(start_x, end_x):
             for y in range(start_y, end_y):            

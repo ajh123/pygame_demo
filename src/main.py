@@ -4,7 +4,7 @@ import random
 from camera import Camera
 from renderer import Renderer
 from entities import Chest, Tree, Zombie
-from world import Tile, World, is_entity_at
+from world import Tile, World
 from file_utils import ImageLoader
 
 # Global tiles
@@ -20,7 +20,8 @@ class Game:
         self.running = True
 
         self.world = World()
-        self.camera = Camera(self.world, width, height)
+        self.camera = Camera(self.screen.get_width(), self.screen.get_height())
+        self.camera.set_world(self.world)
         self.loader = ImageLoader()
         self.renderer = Renderer(self.screen, self.camera, self.world, self.loader)
 
@@ -48,8 +49,8 @@ class Game:
                 self.screen = pygame.display.set_mode(
                     (event.w, event.h), pygame.RESIZABLE
                 )
-                self.camera.width = event.w
-                self.camera.height = event.h
+                self.camera.display_width = event.w
+                self.camera.display_height = event.h
         self.camera.handle_input()
 
     def update_timing(self):
@@ -79,18 +80,30 @@ class Game:
                     tile_map.add_tile(x, y, DIRT)
                 else:
                     tile_map.add_tile(x, y, GRASS)
-                    if r < 0.1 and not is_entity_at(self.world, x, y, excluded):
-                        Tree(self.world, x, y)
-                if r < 0.005 and not is_entity_at(self.world, x, y, excluded):
-                    Chest(self.world, x, y)
+                    if r < 0.1:
+                        tree = Tree(x, y)
+                        if not self.world.has_collision(tree, excluded):
+                            tree.set_world(self.world)
+                        else:
+                            del tree
+                
+                if r < 0.005:
+                    chest = Chest(x, y)
+                    if not self.world.has_collision(chest, excluded):
+                        chest.set_world(self.world)
+                    else:
+                        del chest
 
     def spawn_zombies(self, count: int):
         excluded = [Camera]
         for _ in range(count):
             x = random.randint(-50, 50)
             y = random.randint(-50, 50)
-            if not is_entity_at(self.world, x, y, excluded):
-                Zombie(self.world, x, y)
+            zombie = Zombie(x, y)
+            if not self.world.has_collision(zombie, excluded):
+                zombie.set_world(self.world)
+            else:
+                del zombie
 
     def render(self):
         self.renderer.render()
