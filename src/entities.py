@@ -37,9 +37,9 @@ class Zombie(Entity):
         self.set_image_state("default")
         self.health = 100
 
-    def tick(self):
-        super().tick()
+    def tick(self, dt: float):
+        super().tick(dt)
         # Simple random movement logic
         import random
         if random.random() < 0.1:
-            self.set_velocity(random.uniform(-0.1, 0.1), random.uniform(-0.1, 0.1))
+            self.set_velocity(random.uniform(-3, 3), random.uniform(-3, 3))

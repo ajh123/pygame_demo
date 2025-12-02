@@ -7,7 +7,7 @@ from world import Entity
 
 
 class Camera(Entity):
-    def __init__(self, world: World, width: int, height: int, speed: float = 0.1):
+    def __init__(self, world: World, width: int, height: int, speed: float = 3):
         image_map = {
             "default": "assets/player004.png"
         }

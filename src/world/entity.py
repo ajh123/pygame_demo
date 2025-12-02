@@ -22,7 +22,7 @@ class Entity:
         self.current_image_key: str | None = None
         self.health = -1 # -1 means infinite health
 
-    def tick(self):
+    def tick(self, dt: float):
         """Update entity position based on its velocity with basic collision checking.
 
         This performs a simple entity-vs-entity AABB-style check using
@@ -36,8 +36,8 @@ class Entity:
         if self.velocity_dx == 0.0 and self.velocity_dy == 0.0:
             return
 
-        target_x = self.x + self.velocity_dx
-        target_y = self.y + self.velocity_dy
+        target_x = self.x + (self.velocity_dx * dt)
+        target_y = self.y + (self.velocity_dy * dt)
 
         # exclude self from collision checks
         excluded = [type(self)]

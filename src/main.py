@@ -1,6 +1,5 @@
 import pygame
-screen = pygame.display.set_mode((800, 600), pygame.RESIZABLE)
-pygame.init()
+import random
 
 from camera import Camera
 from renderer import Renderer
@@ -8,73 +7,94 @@ from entities import Chest, Tree, Zombie
 from world import Tile, World, is_entity_at
 from file_utils import ImageLoader
 
-import random
-
+# Global tiles
 GRASS = Tile("grass", "assets/0_0.png")
 DIRT = Tile("dirt", "assets/32_64.png")
 
-def generate_tiles(world: World):
-    random.seed(0)
-    r = random.random()
-    tile_map = world.get_tile_map()
-    excluded = [Camera]
-    for x in range(-50, 50):
-        for y in range(-50, 50):
-            r = random.random()
-            if (x + y) % 3 == 0:
-                tile_map.add_tile(x, y, DIRT)
-            else:
-                tile_map.add_tile(x, y, GRASS)
-                if r < 0.1:
-                    if not is_entity_at(world, x, y, excluded):
-                        Tree(world, x, y)
-            if r < 0.005:
-                if not is_entity_at(world, x, y, excluded):
-                    Chest(world, x, y)
 
-def random_zombies(world: World, count: int):
-    excluded = [Camera]
-    for _ in range(count):
-        x = random.randint(-50, 50)
-        y = random.randint(-50, 50)
-        
-        if not is_entity_at(world, x, y, excluded):
-            Zombie(world, x, y)
+class Game:
+    def __init__(self, width: int = 800, height: int = 600):
+        pygame.init()
+        self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE)
+        self.clock = pygame.time.Clock()
+        self.running = True
 
-def main():
-    global screen
-    random.seed(0)
-    clock = pygame.time.Clock()
-    world = World()
-    camera = Camera(world, screen.get_width(), screen.get_height())
-    image_loader = ImageLoader()
-    renderer = Renderer(screen, camera, world, image_loader)
+        self.world = World()
+        self.camera = Camera(self.world, width, height)
+        self.loader = ImageLoader()
+        self.renderer = Renderer(self.screen, self.camera, self.world, self.loader)
 
-    generate_tiles(world)
+        random.seed(0)
+        self.generate_tiles()
 
-    running = True
-    while running:
+        self.fixed_dt = 1 / 60
+        self.accumulator = 0
+        self.last_time = pygame.time.get_ticks() / 1000
+
+    def run(self):
+        while self.running:
+            self.handle_events()
+            self.update_timing()
+            self.perform_fixed_updates()
+            self.render()
+            self.clock.tick(120)
+        pygame.quit()
+
+    def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                self.running = False
             elif event.type == pygame.VIDEORESIZE:
-                screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
-                camera.width = event.w
-                camera.height = event.h
+                self.screen = pygame.display.set_mode(
+                    (event.w, event.h), pygame.RESIZABLE
+                )
+                self.camera.width = event.w
+                self.camera.height = event.h
+        self.camera.handle_input()
 
-        camera.handle_input()
+    def update_timing(self):
+        now = pygame.time.get_ticks() / 1000
+        dt = now - self.last_time
+        self.last_time = now
+        self.accumulator += min(dt, 0.25)
 
-        for entity in world.get_entities():
-            entity.tick()
+    def perform_fixed_updates(self):
+        while self.accumulator >= self.fixed_dt:
+            self.update_world(self.fixed_dt)
+            self.accumulator -= self.fixed_dt
 
-        r = random.random()
-        if r < 0.007:
-            random_zombies(world, 5)
+    def update_world(self, dt: float):
+        for entity in self.world.get_entities():
+            entity.tick(dt)
+        if random.random() < 0.007:
+            self.spawn_zombies(5)
 
-        renderer.render()
-        clock.tick(60)
+    def generate_tiles(self):
+        tile_map = self.world.get_tile_map()
+        excluded = [Camera]
+        for x in range(-50, 50):
+            for y in range(-50, 50):
+                r = random.random()
+                if (x + y) % 3 == 0:
+                    tile_map.add_tile(x, y, DIRT)
+                else:
+                    tile_map.add_tile(x, y, GRASS)
+                    if r < 0.1 and not is_entity_at(self.world, x, y, excluded):
+                        Tree(self.world, x, y)
+                if r < 0.005 and not is_entity_at(self.world, x, y, excluded):
+                    Chest(self.world, x, y)
 
-    pygame.quit()
+    def spawn_zombies(self, count: int):
+        excluded = [Camera]
+        for _ in range(count):
+            x = random.randint(-50, 50)
+            y = random.randint(-50, 50)
+            if not is_entity_at(self.world, x, y, excluded):
+                Zombie(self.world, x, y)
+
+    def render(self):
+        self.renderer.render()
+
 
 if __name__ == "__main__":
-    main()
+    Game().run()
