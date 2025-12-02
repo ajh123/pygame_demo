@@ -1,11 +1,16 @@
+## Chest Hunters Game
+
+A simple 2D top-down adventure game built using Pygame. The player navigates through a map, collecting treasures while avoiding enemies that become more challenging as the game progresses.
+
+Currently in development, there is no enemy AI or even treasure collection implemented yet. However, the basic movement and environment setup is in place.
+
 ## How does this relate to our personal skills?
+
 - Increases our Strategic thinking and mindset.
 - As it's a single player game.it nurtures independence
 - It promotes friendly competitiveness as its a offline player based game.
-- It helps with responsibilty - users have to consistently collect treasures as without them, the opponents grow stronger and the threat level increases.
+- It helps with responsibility - users have to consistently collect treasures as without them, the opponents grow stronger and the threat level increases.
 - The game helps to enhance competitiveness. 
-
-
 
 ## Assets used
 
