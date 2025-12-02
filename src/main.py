@@ -3,19 +3,25 @@ screen = pygame.display.set_mode((800, 600), pygame.RESIZABLE)
 pygame.init()
 
 from camera import Camera
-from tiles import TileMap, GRASS, DIRT, TREE
+from tiles import TileMap, GRASS, DIRT, TREE, CHEST_CLOSED, CHEST_OPEN
 from renderer import Renderer
 
+import random
+
 def generate_tiles(tile_map: TileMap):
+    random.seed(0)
+    r = random.random()
     for x in range(-50, 50):
         for y in range(-50, 50):
+            r = random.random()
             if (x + y) % 3 == 0:
                 tile_map.add_tile(x, y, DIRT)
             else:
                 tile_map.add_tile(x, y, GRASS)
-
-                if (x + y) % 2 == 0:
+                if r < 0.1:
                     tile_map.add_tile(x, y, TREE, layer=1)
+            if r < 0.005:
+                tile_map.add_tile(x, y, CHEST_CLOSED, layer=1)
 
 def main():
     global screen

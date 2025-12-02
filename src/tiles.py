@@ -22,4 +22,6 @@ class TileMap:
 
 GRASS = Tile("grass", load_image("assets/0_0.png"))
 DIRT = Tile("dirt", load_image("assets/32_64.png"))
-TREE = Tile("tree", load_image("assets/tree.png"))
+TREE = Tile("tree", load_image("assets/jungle-tree_0.png"))
+CHEST_CLOSED = Tile("chest_closed", load_image("assets/chest_closed.png"))
+CHEST_OPEN = Tile("chest_open", load_image("assets/chest_open.png"))

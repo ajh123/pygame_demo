@@ -24,9 +24,9 @@ class Renderer:
         start_y = int((self.camera.y - self.camera.height // 2) // TILE_SIZE)
         end_y = int((self.camera.y + self.camera.height // 2) // TILE_SIZE + 1)
 
-        for x in range(start_x, end_x):
-            for y in range(start_y, end_y):
-                for layer in range(3):  # Assuming 3 layers for now
+        for layer in range(3):  # Assuming 3 layers for now
+            for x in range(start_x, end_x):
+                for y in range(start_y, end_y):            
                     tile = self.tile_map.get_tile(x, y, layer)
                     if tile:
                         screen_x, screen_y = self.camera.world_to_screen(x, y, TILE_SIZE)
