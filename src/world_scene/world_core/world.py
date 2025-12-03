@@ -5,7 +5,7 @@ from .spatial_hash import SpatialHash
 
 if TYPE_CHECKING:
     from .entity import Entity
-    from graphics import MessageLog
+    from ..graphics import MessageLog
 
 
 class World:

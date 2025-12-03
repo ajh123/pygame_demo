@@ -1,8 +1,8 @@
 from typing import TYPE_CHECKING
 
 import pygame
-from world import Entity
-from graphics import screen_to_world
+from .world_core import Entity
+from .graphics import screen_to_world
 
 if TYPE_CHECKING:
     from main import Game
@@ -46,7 +46,7 @@ class Player(Entity):
         self.set_velocity(dx * self.speed, dy * self.speed)
 
     def handle_click(self, mouse_x: int, mouse_y: int):
-        from entities import Zombie
+        from .entities import Zombie
         if not self.world:
             return
 

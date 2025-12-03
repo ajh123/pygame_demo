@@ -1,12 +1,12 @@
 from typing import TYPE_CHECKING, Tuple
 
 import pygame
-from constants import TILE_SIZE
+from ..constants import TILE_SIZE
 
 if TYPE_CHECKING:
     from main import Game
-    from player import Player
-    from world import World
+    from ..player import Player
+    from ..world_core import World
 
 
 class Renderer:

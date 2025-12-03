@@ -6,7 +6,7 @@ import pygame_gui
 if TYPE_CHECKING:
     from main import Game
 
-from .scene import Scene
+from scene import Scene
 
 
 class MenuScene(Scene):
@@ -59,5 +59,5 @@ class MenuScene(Scene):
                 ))
             elif event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == self.start_button:
-                    from scenes.world_scene import WorldScene
+                    from world_scene import WorldScene
                     self.game.set_scene(lambda: WorldScene(self.game))

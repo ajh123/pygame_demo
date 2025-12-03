@@ -1,5 +1,5 @@
-from player import Player
-from world import Entity
+from .player import Player
+from .world_core import Entity
 import time
 import random
 

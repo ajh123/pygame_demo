@@ -2,8 +2,8 @@ from typing import Callable
 
 import pygame
 import pygame_gui
-from scenes import Scene
-from scenes.menu_scene import MenuScene
+from scene import Scene
+from menu_scene import MenuScene
 from assets import AssetManager
 
 class Game:

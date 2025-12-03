@@ -1,9 +1,6 @@
 import pygame
 import pygame_gui
-from typing import List, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    pass
+from typing import List
 
 
 class Message:

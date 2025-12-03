@@ -1,15 +1,15 @@
 import pygame
 from typing import TYPE_CHECKING, List
 
-from .scene import Scene
-from graphics import Renderer, MessageLog, HUD, get_screen_bounds
-from world import Tile, World
-from entities import Chest, Tree, Zombie, Player
+from .graphics import MessageLog, HUD, Renderer, get_screen_bounds
+from .world_core import Tile, World
+from .entities import Chest, Tree, Zombie, Player
 import random
+from scene import Scene
 
 if TYPE_CHECKING:
     from main import Game
-    from player import Player
+    from .player import Player
 
 # Global tiles
 GRASS = Tile("grass", "textures/tiles/grass0.png")

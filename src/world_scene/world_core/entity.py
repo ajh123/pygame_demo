@@ -1,9 +1,9 @@
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from player import Player
+    from ..player import Player
 
 from .world import World
-from constants import TILE_SIZE
+from ..constants import TILE_SIZE
 
 class Entity:
     def __init__(self,
