@@ -70,7 +70,8 @@ class Player(Entity):
         self.world.is_frozen = True
         self.set_velocity(0, 0)
         self.lives -= 1
-        self.pos = (0, 0)  # Respawn at origin
+        self.pos = (0, 0)
+        self.world.update_entity_position(self)
         if self.lives <= 0:
             return
 
